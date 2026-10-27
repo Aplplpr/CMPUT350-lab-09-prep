@@ -138,7 +138,26 @@ int main() {
         //
         // Use SOFT_LIMIT_PERCENT and HARD_LIMIT_PERCENT to parameterize the green and red
         // line positions.
-        camera.setCameraCenter({player.position.x, WINDOW_HEIGHT * 0.5f});
+        sf::Vector2f playerWindow = camera.worldToWindow(player.position);
+        float playerX = playerWindow.x;
+
+        float leftSoft = WINDOW_WIDTH * SOFT_LIMIT_PERCENT;
+        float rightSoft = WINDOW_WIDTH * (1.f - SOFT_LIMIT_PERCENT);
+        float leftHard = WINDOW_WIDTH * HARD_LIMIT_PERCENT;
+        float rightHard = WINDOW_WIDTH * (1.f - HARD_LIMIT_PERCENT);
+
+        if (playerX < leftHard) {
+            camera.translateWindow({playerX - leftHard, 0.f});
+        } else if (playerX > rightHard) {
+            camera.translateWindow({playerX - rightHard, 0.f});
+        } else if (playerX < leftSoft) {
+            float distance = playerX - leftSoft;
+            camera.translateWindow({distance * SOFT_CAMERA_ALPHA, 0.f});
+        } else if (playerX > rightSoft) {
+            float distance = playerX - rightSoft;
+            camera.translateWindow({distance * SOFT_CAMERA_ALPHA, 0.f});
+        }
+
 
         worldView.setCenter(camera.getCameraCenter());
         window.clear(sf::Color::Black);
